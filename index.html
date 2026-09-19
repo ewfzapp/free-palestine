@@ -1,7 +1,7 @@
 <title>Free Palestine</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800&family=Cairo:wght@900&display=swap">
 <style>
   :root{
     --bg:#050505;
@@ -64,10 +64,31 @@
   .zigzag.flip{ transform:scaleY(-1); margin-top:0; }
 
   main{
-    position:relative; z-index:1;
+    position:relative;
     padding:clamp(48px,9vw,96px) 32px clamp(24px,5vw,40px);
     text-align:center;
+    overflow:hidden;
   }
+  .ar-watermark{
+    position:absolute;
+    inset:0;
+    z-index:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    pointer-events:none;
+  }
+  .ar-watermark span{
+    font-family:"Cairo", ui-sans-serif, sans-serif;
+    font-weight:900;
+    font-size:min(30vw, 340px);
+    line-height:1;
+    color:var(--paper);
+    opacity:.16;
+    color:var(--green);
+    white-space:nowrap;
+  }
+  .hero-content{ position:relative; z-index:1; }
   .eyebrow{
     display:block;
     font-family:"Anton", ui-sans-serif, sans-serif;
@@ -232,6 +253,8 @@
 <div class="zigzag flip"></div>
 
 <main>
+  <div class="ar-watermark" aria-hidden="true" dir="rtl" lang="ar"><span>فلسطين حرة</span></div>
+  <div class="hero-content">
   <span class="eyebrow">Free</span>
   <h1>Palestine</h1>
   <div class="underline"></div>
@@ -281,6 +304,7 @@
       </div>
     </div>
     <p class="evo-source">Tracés à partir de données géographiques réelles (geoBoundaries, CC BY 4.0) et de la Résolution 181 de l'Assemblée générale de l'ONU (29 nov. 1947) pour les pourcentages du plan de partage.</p>
+  </div>
   </div>
 </main>
 
