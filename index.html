@@ -106,10 +106,37 @@
     color:rgba(242,239,231,.45);
     margin-bottom:18px;
   }
+  .evo-stage{
+    position:relative;
+    width:min(46vw, 210px);
+    aspect-ratio:300/808;
+    margin:0 auto 14px;
+  }
+  .stage-step{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center;
+    opacity:0;
+    transition:opacity .32s ease;
+  }
+  .stage-step.active{ opacity:1; }
+  .stage-step svg{ width:100%; height:100%; display:block; }
+  .stage-label{
+    margin-top:12px;
+    font-weight:800; font-size:.9rem; letter-spacing:.02em;
+    color:var(--paper);
+    min-height:1.2em;
+  }
   .evo-row{
     display:flex; gap:clamp(10px,2.4vw,22px);
     overflow-x:auto;
     padding-bottom:4px;
+    opacity:0;
+    transition:opacity .7s ease;
+  }
+  .evo-row.show{ opacity:1; }
+  @media (prefers-reduced-motion: reduce){
+    .evo-stage{ display:none; }
+    .evo-row{ opacity:1; transition:none; }
   }
   .panel{
     flex:1 1 0;
@@ -117,8 +144,8 @@
     display:flex; flex-direction:column; align-items:center;
   }
   .panel svg{ width:100%; height:auto; display:block; }
-  .panel .outline{ fill:none; stroke:rgba(242,239,231,.4); stroke-width:2.5; stroke-linejoin:round; }
-  .panel .fill{ fill:var(--green); stroke:var(--paper); stroke-width:1.6; stroke-linejoin:round; }
+  .panel .outline, .stage-step .outline{ fill:none; stroke:rgba(242,239,231,.4); stroke-width:2.5; stroke-linejoin:round; }
+  .panel .fill, .stage-step .fill{ fill:var(--green); stroke:var(--paper); stroke-width:1.6; stroke-linejoin:round; }
   .panel .year{
     margin-top:10px;
     font-weight:800; font-size:.82rem; letter-spacing:.02em;
@@ -221,6 +248,20 @@
 
   <div class="evolution">
     <p class="evo-title">Ce qu'il en reste — 1946 → aujourd'hui</p>
+
+    <div class="evo-stage" aria-hidden="true">
+      <div class="stage-step" data-i="0">
+        <svg viewBox="0 0 300 808"><use href="#shape-mandate" class="fill"/></svg>
+      </div>
+      <div class="stage-step" data-i="1">
+        <svg viewBox="0 0 300 808"><use href="#shape-mandate" class="outline"/></svg>
+      </div>
+      <div class="stage-step" data-i="2">
+        <svg viewBox="0 0 300 808"><use href="#shape-mandate" class="outline"/><use href="#shape-pse" class="fill"/></svg>
+      </div>
+      <div class="stage-label"></div>
+    </div>
+
     <div class="evo-row">
       <div class="panel">
         <svg viewBox="0 0 300 808"><use href="#shape-mandate" class="fill"/></svg>
@@ -253,6 +294,50 @@
     </div>
   </div>
 </div>
+
+<script>
+  // Anime la frise : cycle 1946 → 1947 → 1967 trois fois, puis révèle la vue fixe en 3 cartes.
+  (function () {
+    const stage = document.querySelector('.evo-stage');
+    const row = document.querySelector('.evo-row');
+    const source = document.querySelector('.evo-source');
+    if (!stage || !row) return;
+
+    const steps = stage.querySelectorAll('.stage-step');
+    const label = stage.querySelector('.stage-label');
+    const labels = ['1946', '1947', 'Depuis 1967'];
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function reveal() {
+      stage.style.display = 'none';
+      row.classList.add('show');
+    }
+
+    if (reduceMotion || steps.length === 0) { reveal(); return; }
+
+    let i = 0;
+    const cycles = 3;
+    const totalTicks = cycles * steps.length;
+    const tickMs = 480;
+
+    steps[0].classList.add('active');
+    if (label) label.textContent = labels[0];
+
+    const timer = setInterval(() => {
+      i++;
+      if (i >= totalTicks) {
+        clearInterval(timer);
+        steps.forEach((s) => s.classList.remove('active'));
+        setTimeout(reveal, 260);
+        return;
+      }
+      const idx = i % steps.length;
+      steps.forEach((s) => s.classList.remove('active'));
+      steps[idx].classList.add('active');
+      if (label) label.textContent = labels[idx];
+    }, tickMs);
+  })();
+</script>
 
 <script>
   // Compteur public : appelle le Cloudflare Worker (voir worker.js).
