@@ -1,0 +1,7 @@
+name = "free-palestine-counter"
+main = "worker.js"
+compatibility_date = "2026-09-19"
+
+kv_namespaces = [
+  { binding = "COUNTER", id = "REMPLACE_PAR_L_ID_DU_NAMESPACE" }
+]
