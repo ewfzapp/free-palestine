@@ -11,12 +11,27 @@ export default {
       return new Response(null, { headers: cors });
     }
 
-    const current = parseInt((await env.COUNTER.get("visits")) || "0", 10);
-    const next = current + 1;
-    await env.COUNTER.put("visits", String(next));
+    const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+    const ipHash = await sha256(ip);
+    const seenKey = `seen:${ipHash}`;
 
-    return new Response(JSON.stringify({ count: next }), {
+    let current = parseInt((await env.COUNTER.get("visits")) || "0", 10);
+    const alreadySeen = await env.COUNTER.get(seenKey);
+
+    if (!alreadySeen) {
+      current += 1;
+      await env.COUNTER.put("visits", String(current));
+      await env.COUNTER.put(seenKey, "1");
+    }
+
+    return new Response(JSON.stringify({ count: current }), {
       headers: { ...cors, "Content-Type": "application/json" },
     });
   },
 };
+
+async function sha256(text) {
+  const data = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  return [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
